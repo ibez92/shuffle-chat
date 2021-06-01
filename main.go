@@ -3,99 +3,52 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
-	"sort"
-	"strings"
+	"sortmyvoice/discord"
 	"syscall"
-
-	"github.com/bwmarrin/discordgo"
 )
 
 func init() {
 	flag.StringVar(&token, "t", "", "Bot token")
+	flag.StringVar(&zoomToken, "zoomt", "", "Zoom token")
+	flag.StringVar(&zoomSecret, "zooms", "", "Zoom token")
 	flag.Parse()
 }
 
 var token string
+var zoomToken string
+var zoomSecret string
 
 func main() {
-	if token == "" {
-		fmt.Println("No token provided. Please run: sortmyvoice -t <bot token>")
-		return
-	}
+	validateTokens()
 
-	dg, err := discordgo.New("Bot " + token)
+	dg, err := discord.Open(token)
 	if err != nil {
-		fmt.Println("Error creating Discord session: ", err)
+		log.Fatal("Error creating Discord session: ", err)
 		return
-	}
-
-	dg.AddHandler(ready)
-	dg.AddHandler(messageCreate)
-
-	// Open the websocket and begin listening.
-	err = dg.Open()
-	if err != nil {
-		fmt.Println("Error opening Discord session: ", err)
 	}
 	// Cleanly close down the Discord session.
 	defer dg.Close()
 
 	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("Sortmyvoice is now running. Press CTRL-C to exit.")
+	fmt.Println("shuffle-zoom-conf is now running. Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 }
 
-func ready(s *discordgo.Session, event *discordgo.Ready) {
-	s.UpdateGameStatus(0, "!sortmyvoice")
-}
-
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Author.ID == s.State.User.ID {
-		return
+func validateTokens() {
+	if token == "" {
+		log.Fatal("No token provided. Please run: shuffle-zoom-conf -t <bot token>")
 	}
 
-	if m.Content != "!sortmyvoice" {
-		return
+	if zoomToken == "" {
+		log.Fatal("No zoom token provided. Please run: shuffle-zoom-conf -zoomt <zoom token>")
 	}
 
-	c, err := s.State.Channel(m.ChannelID)
-	if err != nil {
-		return
+	if zoomSecret == "" {
+		log.Fatal("No token provided. Please run: shuffle-zoom-conf -zooms <zoom secret>")
 	}
-
-	if c.Name != "bot" {
-		return
-	}
-
-	g, err := s.State.Guild(c.GuildID)
-	if err != nil {
-		return
-	}
-
-	var authorVoiceChID string
-	for _, vs := range g.VoiceStates {
-		if vs.UserID == m.Author.ID {
-			authorVoiceChID = vs.ChannelID
-		}
-	}
-
-	userNames := make([]string, 15)
-	counter := 0
-	for _, vs := range g.VoiceStates {
-		if vs.ChannelID == authorVoiceChID {
-			m, err := s.State.Member(vs.GuildID, vs.UserID)
-			if err != nil {
-				continue
-			}
-			userNames[counter] = fmt.Sprintf("%d) %s", counter+1, m.User.String())
-			counter++
-		}
-	}
-
-	sort.Strings(userNames)
-	s.ChannelMessageSend(c.ID, strings.Join(userNames, "\n"))
 }
