@@ -1,20 +1,16 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
-	"sortmyvoice/discord"
+	"shufflezoomconf/discord"
 	"syscall"
 )
 
 func init() {
-	flag.StringVar(&token, "t", "", "Bot token")
-	flag.StringVar(&zoomToken, "zoomt", "", "Zoom token")
-	flag.StringVar(&zoomSecret, "zooms", "", "Zoom token")
-	flag.Parse()
+	fmt.Println("Make some ENV handler")
 }
 
 var token string
