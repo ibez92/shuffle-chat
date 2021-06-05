@@ -5,17 +5,21 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"shufflezoomconf/discord"
+	"shufflezoommeeting/internal/discord"
 	"syscall"
 )
-
-func init() {
-	fmt.Println("Make some ENV handler")
-}
 
 var token string
 var zoomToken string
 var zoomSecret string
+var zoomMeetingID string
+
+func init() {
+	token = os.Getenv("DISCORD_TOKEN")
+	zoomToken = os.Getenv("ZOOM_TOKEN")
+	zoomSecret = os.Getenv("ZOOM_SECRET")
+	zoomMeetingID = os.Getenv("ZOOM_MEETING_ID")
+}
 
 func main() {
 	validateTokens()

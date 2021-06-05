@@ -1,4 +1,4 @@
-module shufflezoomconf
+module shufflezoommeeting
 
 go 1.16
 
