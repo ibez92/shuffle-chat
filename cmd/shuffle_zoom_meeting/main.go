@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"shufflezoommeeting/internal/discord"
+	"shufflezoommeeting/internal/zoom"
 	"syscall"
 )
 
@@ -24,13 +25,10 @@ func init() {
 func main() {
 	validateTokens()
 
-	dg, err := discord.Open(token)
-	if err != nil {
-		log.Fatal("Error creating Discord session: ", err)
-		return
-	}
-	// Cleanly close down the Discord session.
-	defer dg.Close()
+	zoomClient := zoom.NewClient(zoomToken, zoomSecret, zoomMeetingID)
+	discordClient := discord.NewClient(token, zoomClient)
+
+	defer discordClient.Ds.Close()
 
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("shuffle-zoom-conf is now running. Press CTRL-C to exit.")
