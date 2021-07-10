@@ -1,0 +1,18 @@
+mode: set
+shufflezoommeeting/internal/zoom/client.go:21.77,23.2 1 1
+shufflezoommeeting/internal/zoom/client.go:25.82,27.21 2 1
+shufflezoommeeting/internal/zoom/client.go:30.2,30.15 1 1
+shufflezoommeeting/internal/zoom/client.go:33.2,36.16 3 1
+shufflezoommeeting/internal/zoom/client.go:39.2,46.16 6 1
+shufflezoommeeting/internal/zoom/client.go:49.2,53.16 4 1
+shufflezoommeeting/internal/zoom/client.go:56.2,56.23 1 1
+shufflezoommeeting/internal/zoom/client.go:60.2,60.32 1 1
+shufflezoommeeting/internal/zoom/client.go:27.21,29.3 1 1
+shufflezoommeeting/internal/zoom/client.go:30.15,32.3 1 0
+shufflezoommeeting/internal/zoom/client.go:36.16,38.3 1 0
+shufflezoommeeting/internal/zoom/client.go:46.16,48.3 1 0
+shufflezoommeeting/internal/zoom/client.go:53.16,55.3 1 0
+shufflezoommeeting/internal/zoom/client.go:56.23,58.3 1 1
+shufflezoommeeting/internal/zoom/client.go:63.53,73.16 4 1
+shufflezoommeeting/internal/zoom/client.go:77.2,77.23 1 1
+shufflezoommeeting/internal/zoom/client.go:73.16,75.3 1 0

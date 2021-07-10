@@ -9,18 +9,18 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+const jwtExpiredIn time.Duration = 90 * time.Minute
+
 type Client struct {
 	token            string
 	secret           string
 	defaultMeetingID string
+	apiEndpoint      string
 }
 
-func NewClient(token, secret, defaultMeetingID string) *Client {
-	return &Client{token, secret, defaultMeetingID}
+func NewClient(token, secret, defaultMeetingID, apiEndpoint string) *Client {
+	return &Client{token, secret, defaultMeetingID, apiEndpoint}
 }
-
-const apiPath = "https://api.zoom.us/v2"
-const jwtExpiredIn time.Duration = 90 * time.Minute
 
 func (c *Client) GetMeetingParticipants(meetingID string) ([]Participant, error) {
 	mID := meetingID
@@ -30,7 +30,7 @@ func (c *Client) GetMeetingParticipants(meetingID string) ([]Participant, error)
 	if mID == "" {
 		return nil, errors.New("Meeting id can't be blank")
 	}
-	url := apiPath + "/metrics/meetings/" + mID + "/participants"
+	url := c.apiEndpoint + "/metrics/meetings/" + mID + "/participants"
 
 	token, err := c.generateJwtToken()
 	if err != nil {
@@ -52,6 +52,9 @@ func (c *Client) GetMeetingParticipants(meetingID string) ([]Participant, error)
 	err = json.NewDecoder(resp.Body).Decode(pResp)
 	if err != nil {
 		return nil, err
+	}
+	if pResp.Code >= 300 {
+		return nil, errors.New(pResp.Message)
 	}
 
 	return pResp.Partisipants, nil

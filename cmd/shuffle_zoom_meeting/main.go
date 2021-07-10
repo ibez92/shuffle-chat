@@ -10,6 +10,8 @@ import (
 	"syscall"
 )
 
+const zoomApiEndpoint = "https://api.zoom.us/v2"
+
 var token string
 var zoomToken string
 var zoomSecret string
@@ -25,7 +27,7 @@ func init() {
 func main() {
 	validateTokens()
 
-	zoomClient := zoom.NewClient(zoomToken, zoomSecret, zoomMeetingID)
+	zoomClient := zoom.NewClient(zoomToken, zoomSecret, zoomMeetingID, zoomApiEndpoint)
 	discordClient := discord.NewClient(token, zoomClient)
 
 	defer discordClient.Ds.Close()
