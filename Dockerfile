@@ -4,15 +4,10 @@ WORKDIR /src
 
 COPY . .
 
-RUN go build -o shufflezoommeeting .
+RUN go build -o app ./cmd/shuffle_zoom_meeting
 
 FROM debian:buster
 
-ENV DISCORD_TOKEN ""
-ENV ZOOM_TOKEN ""
-ENV ZOOM_SECRET ""
-ENV ZOOM_MEETING_ID ""
+COPY --from=builder /src/app /usr/local/bin/app
 
-COPY --from=builder /src/shufflezoommeeting /usr/local/bin/shufflezoommeeting
-
-CMD [ shufflezoommeeting ]
+CMD [ app ]
