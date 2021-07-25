@@ -53,7 +53,7 @@ func (c *Client) GetMeetingParticipants(meetingID string) ([]Participant, error)
 	if err != nil {
 		return nil, err
 	}
-	if pResp.Code >= 300 {
+	if pResp.Code != 0 && pResp.Code != 200 {
 		return nil, errors.New(pResp.Message)
 	}
 
