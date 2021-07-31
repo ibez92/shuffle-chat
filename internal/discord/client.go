@@ -2,41 +2,57 @@ package discord
 
 import (
 	"log"
-	"shufflezoommeeting/internal/zoom"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 type Client struct {
-	Ds         *discordgo.Session
-	zoomClient *zoom.Client
+	Session *discordgo.Session
 }
 
-func NewClient(token string, zoomClient *zoom.Client) *Client {
-	c := Client{zoomClient: zoomClient}
-	ds, err := c.openDiscordSession(token)
+func NewClient(token, guildID string) *Client {
+	c := Client{}
+	session, err := c.openDiscordSession(token, guildID)
 	if err != nil {
 		log.Fatal("Error creating Discord session: ", err)
 	}
-	c.Ds = ds
+	c.Session = session
 
 	return &c
 }
 
-func (c *Client) openDiscordSession(token string) (*discordgo.Session, error) {
-	dg, err := discordgo.New("Bot " + token)
+func (c *Client) openDiscordSession(token, guildID string) (*discordgo.Session, error) {
+	session, err := discordgo.New("Bot " + token)
 	if err != nil {
 		return nil, err
 	}
 
-	dg.AddHandler(ready)
-	dg.AddHandler(messageCreate(c.zoomClient))
+	session.AddHandler(readyHandler)
+	session.AddHandler(commandsHandler)
 
 	// Open the websocket and begin listening.
-	err = dg.Open()
+	err = session.Open()
 	if err != nil {
 		return nil, err
 	}
 
-	return dg, nil
+	createApplicationCommands(session, guildID)
+
+	return session, nil
+}
+
+func createApplicationCommands(session *discordgo.Session, guildID string) {
+	commands := []*discordgo.ApplicationCommand{
+		{
+			Name:        shuffleCommand,
+			Description: "Shuffle participants of current text channel",
+		},
+	}
+
+	for _, v := range commands {
+		_, err := session.ApplicationCommandCreate(session.State.User.ID, guildID, v)
+		if err != nil {
+			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+		}
+	}
 }
