@@ -29,7 +29,7 @@ func shuffleChannelParticipants(s *discordgo.Session, i *discordgo.InteractionCr
 	if len(userNames) > 0 {
 		rand.Shuffle(len(userNames), func(i, j int) { userNames[i], userNames[j] = userNames[j], userNames[i] })
 		return strings.Join(userNames, "\n")
-	} else {
-		return "No people in chat"
 	}
+
+	return "No people in chat"
 }

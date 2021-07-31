@@ -1,6 +1,7 @@
 package discord
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/bwmarrin/discordgo"
@@ -16,12 +17,15 @@ func readyHandler(s *discordgo.Session, event *discordgo.Ready) {
 func commandsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	commandHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		shuffleCommand: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: shuffleChannelParticipants(s, i),
 				},
 			})
+			if err != nil {
+				fmt.Printf("discord/handlers/"+shuffleCommand+" failed. Error: %v", err)
+			}
 		},
 	}
 

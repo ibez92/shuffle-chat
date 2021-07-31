@@ -11,8 +11,6 @@ import (
 
 const runCommand = "Please run: env DISCORD_TOKEN=<bot token> GUILD_ID=<guild id> ./app"
 
-// ODcxMTYwNDM3MjcyNjM3NDYw.YQXRYQ.LtiQunARuZHq1C1ShrICr-LC8_0
-// 871157682076286998
 var token string
 var guildID string
 
