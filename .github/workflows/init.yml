@@ -1,0 +1,33 @@
+name: init
+
+on: [push, pull_request]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  init:
+    name: ${{ matrix.job.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - name: lint
+            command: make lint
+          - name: test
+            command: make test
+    steps:
+      - uses: actions/checkout@v2.3.4
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      - name: Build
+        run: make build
+
+      - name: ${{ matrix.job.name }}
+        run: ${{ matrix.job.command }}
