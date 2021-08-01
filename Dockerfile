@@ -4,7 +4,7 @@ WORKDIR /src
 
 COPY . .
 
-RUN go build -o app ./cmd/shuffle_zoom_meeting
+RUN go build -o app ./cmd/shuffle
 
 FROM debian:buster
 
