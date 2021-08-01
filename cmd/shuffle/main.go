@@ -5,8 +5,9 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"shufflezoommeeting/internal/discord"
 	"syscall"
+
+	"github.com/psy1992/shuffle-chat/internal/discord"
 )
 
 const runCommand = "Please run: env DISCORD_TOKEN=<bot token> GUILD_ID=<guild id> TARGET_ROLE=<role name> ./app"

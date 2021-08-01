@@ -1,4 +1,4 @@
-module shufflezoommeeting
+module github.com/psy1992/shuffle-chat
 
 go 1.16
 
