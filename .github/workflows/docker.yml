@@ -23,7 +23,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v3.3.0
         with:
-          images: mozgiii/port-map-operator
+          images: psyxoz/shuffle-chat
           tags: |
             type=schedule
             type=ref,event=branch
