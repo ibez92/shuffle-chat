@@ -15,7 +15,7 @@ jobs:
       matrix:
         job:
           - name: lint
-            command: make lint
+            command: make lint-action
           - name: test
             command: make test
     steps:
