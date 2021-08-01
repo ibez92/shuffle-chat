@@ -7,11 +7,12 @@ import (
 )
 
 type Client struct {
-	Session *discordgo.Session
+	Session    *discordgo.Session
+	targetRole string
 }
 
-func NewClient(token, guildID string) *Client {
-	c := Client{}
+func NewClient(token, guildID, targetRole string) *Client {
+	c := Client{targetRole: targetRole}
 	session, err := c.openDiscordSession(token, guildID)
 	if err != nil {
 		log.Fatal("Error creating Discord session: ", err)
@@ -27,8 +28,8 @@ func (c *Client) openDiscordSession(token, guildID string) (*discordgo.Session, 
 		return nil, err
 	}
 
-	session.AddHandler(readyHandler)
-	session.AddHandler(commandsHandler)
+	session.AddHandler(c.readyHandler)
+	session.AddHandler(c.commandsHandler)
 
 	// Open the websocket and begin listening.
 	err = session.Open()
