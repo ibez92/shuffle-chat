@@ -28,9 +28,6 @@ func init() {
 	}
 
 	targetRole = os.Getenv("TARGET_ROLE")
-	if targetRole == "" {
-		log.Fatal("No targetRole provided. " + runCommand)
-	}
 }
 
 func main() {

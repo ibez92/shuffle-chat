@@ -4,77 +4,119 @@ import (
 	"testing"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/stretchr/testify/assert"
+	"github.com/golang/mock/gomock"
+
+	m "github.com/psy1992/shuffle-chat/internal/discord/mocks"
 )
 
-func Test_shuffle(t *testing.T) {
-	targetRole := "tr"
+//nolint:funlen
+func Test_shuffleChannelMembers(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	guildID := "guildID"
+
+	type discordContract struct {
+		guildID string
+		members []*discordgo.Member
+		ic      *discordgo.InteractionCreate
+		mErr    error
+		iErr    error
+	}
 
 	tests := []struct {
-		name       string
-		recipients []*discordgo.User
-		members    []*discordgo.Member
-		result     string
+		name            string
+		discordContract discordContract
+		tr              string
+		result          string
 	}{
 		{
 			name: "Success",
-			recipients: []*discordgo.User{
-				{ID: "ID1", Username: "1"},
-				{ID: "ID2", Username: "2"},
-				{ID: "ID3", Username: "3"},
-				{ID: "ID4", Username: "4"},
-			},
-			members: []*discordgo.Member{
-				{
-					User:  &discordgo.User{ID: "ID1"},
-					Roles: []string{targetRole},
+			discordContract: discordContract{
+				guildID: guildID,
+				members: []*discordgo.Member{
+					{
+						User: &discordgo.User{Username: "U1"},
+					},
 				},
-				{
-					User:  &discordgo.User{ID: "ID2"},
-					Roles: []string{"invalidRole"},
-				},
-				{
-					User:  &discordgo.User{ID: "invalidID"},
-					Roles: []string{targetRole},
-				},
-				{
-					User:  &discordgo.User{ID: "ID4"},
-					Roles: []string{targetRole},
+				ic: &discordgo.InteractionCreate{
+					Interaction: &discordgo.Interaction{
+						GuildID: guildID,
+					},
 				},
 			},
-			result: "1\n4",
+			result: "U1",
 		},
 		{
-			name:       "No recipients",
-			recipients: []*discordgo.User{},
-			members: []*discordgo.Member{
-				{
-					User:  &discordgo.User{ID: "ID1"},
-					Roles: []string{targetRole},
+			name: "With role filter",
+			discordContract: discordContract{
+				guildID: guildID,
+				members: []*discordgo.Member{
+					{
+						User:  &discordgo.User{Username: "U1"},
+						Roles: []string{"Role1", "Role2"},
+					},
+					{
+						User:  &discordgo.User{Username: "U2"},
+						Roles: []string{"Role2", "Role3"},
+					},
 				},
-				{
-					User:  &discordgo.User{ID: "ID2"},
-					Roles: []string{"invalidRole"},
+				ic: &discordgo.InteractionCreate{
+					Interaction: &discordgo.Interaction{
+						GuildID: guildID,
+					},
 				},
 			},
-			result: noPeopleResult,
+			tr:     "Role1",
+			result: "U1",
 		},
 		{
-			name: "No Members",
-			recipients: []*discordgo.User{
-				{ID: "ID1", Username: "1"},
+			name: "It must skip bots",
+			discordContract: discordContract{
+				guildID: guildID,
+				members: []*discordgo.Member{
+					{
+						User: &discordgo.User{Username: "U1", Bot: true},
+					},
+					{
+						User: &discordgo.User{Username: "U2"},
+					},
+				},
+				ic: &discordgo.InteractionCreate{
+					Interaction: &discordgo.Interaction{
+						GuildID: guildID,
+					},
+				},
 			},
-			members: []*discordgo.Member{},
-			result:  noPeopleResult,
+			result: "U2",
 		},
 	}
 
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			c := Client{targetRole: targetRole}
-			got := c.shuffleChannelParticipants(tt.recipients, tt.members)
-			assert.Equal(t, tt.result, got)
+			sMock := m.NewMockdiscordSession(ctrl)
+			c := Client{targetRole: tt.tr}
+
+			sMock.
+				EXPECT().
+				GuildMembers(tt.discordContract.guildID, "", 1000).
+				Times(1).
+				Return(tt.discordContract.members, tt.discordContract.mErr)
+
+			ir := &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: tt.result,
+				},
+			}
+			sMock.
+				EXPECT().
+				InteractionRespond(tt.discordContract.ic.Interaction, ir).
+				Times(1).
+				Return(tt.discordContract.iErr)
+
+			c.shuffleChannelMembers(sMock, tt.discordContract.ic)
 		})
 	}
 }
