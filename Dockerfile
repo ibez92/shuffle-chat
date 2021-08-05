@@ -15,4 +15,4 @@ RUN apt-get update \
 
 COPY --from=builder /src/app /usr/local/bin/app
 
-CMD [ app ]
+CMD [ /usr/local/bin/app ]
