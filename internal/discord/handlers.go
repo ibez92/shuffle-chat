@@ -7,7 +7,7 @@ import (
 )
 
 func (c *Client) readyHandler(s *discordgo.Session, event *discordgo.Ready) {
-	err := s.UpdateGameStatus(-1, "Let's shuffle this")
+	err := s.UpdateGameStatus(1, "Shuffler")
 	if err != nil {
 		log.Fatal("UpdateStatusComplex error: ", err)
 	}

@@ -7,13 +7,13 @@ import (
 )
 
 type Client struct {
-	Session    *discordgo.Session
-	targetRole string
+	Session      *discordgo.Session
+	targetRoleID string
 }
 
-func NewClient(token, guildID, targetRole string) *Client {
-	c := Client{targetRole: targetRole}
-	session, err := c.openDiscordSession(token, guildID)
+func NewClient(token, targetRoleID string) *Client {
+	c := Client{targetRoleID: targetRoleID}
+	session, err := c.openDiscordSession(token)
 	if err != nil {
 		log.Fatal("Error creating Discord session: ", err)
 	}
@@ -22,7 +22,7 @@ func NewClient(token, guildID, targetRole string) *Client {
 	return &c
 }
 
-func (c *Client) openDiscordSession(token, guildID string) (*discordgo.Session, error) {
+func (c *Client) openDiscordSession(token string) (*discordgo.Session, error) {
 	session, err := discordgo.New("Bot " + token)
 	if err != nil {
 		return nil, err
@@ -37,23 +37,39 @@ func (c *Client) openDiscordSession(token, guildID string) (*discordgo.Session, 
 		return nil, err
 	}
 
-	createApplicationCommands(session, guildID)
+	createApplicationCommands(session)
 
 	return session, nil
 }
 
-func createApplicationCommands(session *discordgo.Session, guildID string) {
+func createApplicationCommands(session *discordgo.Session) {
 	commands := []*discordgo.ApplicationCommand{
 		{
 			Name:        shuffleCommand,
 			Description: "Shuffle participants of current text channel",
+			Options: []*discordgo.ApplicationCommandOption{
+				// {
+				// 	Name:        "role-option",
+				// 	Type:        discordgo.ApplicationCommandOptionString,
+				// 	Description: "Filter members by role",
+				// 	Required:    false,
+				// },
+				{
+					Name:        "role-option",
+					Type:        discordgo.ApplicationCommandOptionRole,
+					Description: "Filter members by role",
+					Required:    false,
+				},
+			},
 		},
 	}
 
 	for _, v := range commands {
-		_, err := session.ApplicationCommandCreate(session.State.User.ID, guildID, v)
-		if err != nil {
-			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+		for _, g := range session.State.Guilds {
+			_, err := session.ApplicationCommandCreate(session.State.User.ID, g.ID, v)
+			if err != nil {
+				log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+			}
 		}
 	}
 }

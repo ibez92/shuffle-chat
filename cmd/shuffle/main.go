@@ -10,11 +10,10 @@ import (
 	"github.com/psy1992/shuffle-chat/internal/discord"
 )
 
-const runCommand = "Please run: env DISCORD_TOKEN=<bot token> GUILD_ID=<guild id> TARGET_ROLE=<role name> ./app"
+const runCommand = "Please run: env DISCORD_TOKEN=<bot token> TARGET_ROLE_ID=<role id> ./app"
 
 var token string
-var guildID string
-var targetRole string
+var targetRoleID string
 
 func init() {
 	token = os.Getenv("DISCORD_TOKEN")
@@ -22,16 +21,14 @@ func init() {
 		log.Fatal("No token provided. " + runCommand)
 	}
 
-	guildID = os.Getenv("GUILD_ID")
-	if guildID == "" {
-		log.Fatal("No guildID provided. " + runCommand)
+	targetRoleID = os.Getenv("TARGET_ROLE_ID")
+	if targetRoleID == "" {
+		log.Fatal("No targetRoleID provided. " + runCommand)
 	}
-
-	targetRole = os.Getenv("TARGET_ROLE")
 }
 
 func main() {
-	discordClient := discord.NewClient(token, guildID, targetRole)
+	discordClient := discord.NewClient(token, targetRoleID)
 	defer discordClient.Session.Close()
 
 	// Wait here until CTRL-C or other term signal is received.

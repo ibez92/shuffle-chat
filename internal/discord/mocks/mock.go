@@ -34,6 +34,36 @@ func (m *MockdiscordSession) EXPECT() *MockdiscordSessionMockRecorder {
 	return m.recorder
 }
 
+// Channel mocks base method.
+func (m *MockdiscordSession) Channel(arg0 string) (*discordgo.Channel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Channel", arg0)
+	ret0, _ := ret[0].(*discordgo.Channel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Channel indicates an expected call of Channel.
+func (mr *MockdiscordSessionMockRecorder) Channel(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Channel", reflect.TypeOf((*MockdiscordSession)(nil).Channel), arg0)
+}
+
+// Guild mocks base method.
+func (m *MockdiscordSession) Guild(arg0 string) (*discordgo.Guild, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Guild", arg0)
+	ret0, _ := ret[0].(*discordgo.Guild)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Guild indicates an expected call of Guild.
+func (mr *MockdiscordSessionMockRecorder) Guild(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Guild", reflect.TypeOf((*MockdiscordSession)(nil).Guild), arg0)
+}
+
 // GuildMembers mocks base method.
 func (m *MockdiscordSession) GuildMembers(arg0, arg1 string, arg2 int) ([]*discordgo.Member, error) {
 	m.ctrl.T.Helper()
